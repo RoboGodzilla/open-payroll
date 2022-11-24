@@ -22,8 +22,14 @@ from nomina import views as nomina_views
 
 
 router = routers.DefaultRouter()
-# router.register(r'users', views.UserViewSet)
-# router.register(r'groups', views.GroupViewSet)
+router.register(r'empleados', empleados_views.EmpleadoViewSet)
+router.register(r'grupos', empleados_views.GrupoViewSet)
+router.register(r'prestaciones', formulas_views.PrestacionesViewSet)
+router.register(r'deducciones', formulas_views.DeduccionesViewSet)
+router.register(r'viaticos', formulas_views.ViaticosViewSet)
+router.register(r'jornada', nomina_views.JornadaViewSet)
+router.register(r'nomina', nomina_views.NominaViewSet)
+router.register(r'planilla', nomina_views.PlanillaViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
