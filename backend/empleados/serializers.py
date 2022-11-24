@@ -4,10 +4,10 @@ from .models import Empleado, Grupo
 class EmpleadoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Empleado
-        fields = ['__all__']
+        fields = '__all__'
 
 
 class GrupoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Grupo
-        fields = ['__all__']
+        fields = '__all__'
