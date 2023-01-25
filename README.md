@@ -9,15 +9,15 @@ evitando errores y multas que pueden dañar tu negocio.
 
 OpenPayroll usa las siguientes tecnologías:
 
-- [ReactJs] - HTML enhanced for web apps!
-- [VSCode] - awesome web-based text editor
-- [Django] - Markdown parser done right. Fast and easy to extend.
-- [Django REST Framework] - great UI boilerplate for modern web apps
-- [PostgreSQL] - evented I/O for the backend
-- [MaterialUI] - fast node.js network app framework [@tjholowaychuk]
-- [Formik] - the streaming build system
+- [ReactJs]
+- [VSCode]
+- [Django]
+- [Django REST Framework]
+- [PostgreSQL]
+- [MaterialUI]
+- [Formik]
 
-## Installation
+## Instalacion
 
 OpenPayroll requiere:
 [node.js] v17+
