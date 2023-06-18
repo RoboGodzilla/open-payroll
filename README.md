@@ -17,7 +17,7 @@ OpenPayroll usa las siguientes tecnologías:
 - [MaterialUI] - fast node.js network app framework [@tjholowaychuk]
 - [Formik] - the streaming build system
 
-## Installation
+## Instalacion
 
 OpenPayroll requiere:
 [node.js] v17+
