@@ -4,7 +4,8 @@ import axios from "axios";
 const token = () => localStorage.getItem("access");
 
 const instance = axios.create({
-  baseURL: "https://openpayroll.herokuapp.com/api/",
+  // baseURL: "https://openpayroll.herokuapp.com/api/",
+  baseURL: "http://127.0.0.1:8000/api/",
 });
 
 // Use interceptor to inject the token to requests

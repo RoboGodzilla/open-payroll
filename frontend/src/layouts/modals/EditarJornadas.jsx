@@ -1,5 +1,6 @@
-import { Button, Modal, TextField } from "@mui/material";
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import { Modal, TextField } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -9,6 +10,8 @@ import dayjs from "dayjs";
 import MDTypography from "../../components/MDTypography";
 import Switch from "@mui/material/Switch";
 import MDButton from "../../components/MDButton";
+import { useMaterialUIController } from "../../context";
+import { getJornadaById } from "../../api/jornadas/jornadas";
 
 const EditarJornadas = ({
   modalEditar,
@@ -22,6 +25,9 @@ const EditarJornadas = ({
   const [valueSeptimo, setValueSeptimo] = React.useState(form.septimo_dia);
   const [valueVacaciones, setValueVacaciones] = React.useState(form.vacaciones);
   const [valueAusencia, setValueAusencia] = React.useState(form.ausencia);
+
+  const [controller] = useMaterialUIController();
+  const { darkMode } = controller;
 
   const handleChangeFeriado = () => {
     setValueFeriado(!valueFeriado);
@@ -60,18 +66,24 @@ const EditarJornadas = ({
       [name]: value,
     }));
   };
-
+  const getIdEmpleado = async (id) => {
+    const a = await getJornadaById(id);
+    setForm({ ...form, empleado: a.data.empleado });
+  };
   // const handleClick = () => {
   //   updateData(form);
   // };
-
+  useEffect(() => {
+    getIdEmpleado(form.id);
+  }, []);
   const BODY = (
-    <div className="modal">
+    <div className={darkMode ? "modal dark" : "modal ligth"}>
       <MDTypography variant="h3">
         Editando Jornada de {form.nombre}
       </MDTypography>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
+          disabled
           className="textInput"
           defaultValue={dayjs(value)}
           maxDate={dayjs(Date.now())}
@@ -158,11 +170,7 @@ const EditarJornadas = ({
       </div>
     </div>
   );
-  return (
-    <Modal open={modalEditar} onClose={abrirModalEditar}>
-      {BODY}
-    </Modal>
-  );
+  return <Modal open={modalEditar}>{BODY}</Modal>;
 };
 
 export default EditarJornadas;

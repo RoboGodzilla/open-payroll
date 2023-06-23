@@ -8,13 +8,23 @@ import {
   GridToolbarExport,
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
-import { Box, Pagination, IconButton, Tooltip, Chip } from "@mui/material";
+import {
+  Box,
+  Pagination,
+  IconButton,
+  Tooltip,
+  Chip,
+  createTheme,
+  ThemeProvider,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DashboardLayout from "./LayoutContainers/DashboardLayout";
 import DashboardNavbar from "./Navbars/DashboardNavbar";
 import Footer from "./Footer";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import MDTypography from "./MDTypography";
+import { useMaterialUIController } from "../context";
 
 function CreateDataElement(
   id,
@@ -49,21 +59,6 @@ function CustomToolbar() {
       <GridToolbarFilterButton />
       <GridToolbarExport />
     </GridToolbarContainer>
-  );
-}
-
-function CustomPagination() {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      color="primary"
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
   );
 }
 
@@ -110,8 +105,59 @@ const DATA = [
 ];
 
 const Colilla = () => {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState(null);
   const [trabajadorSeleccionado, setTrabajadorSeleccionado] = useState(null);
+
+  const [controller] = useMaterialUIController();
+  const { darkMode } = controller;
+
+  const ligth = createTheme({
+    components: {
+      MuiDataGrid: {
+        styleOverrides: {
+          root: {
+            backgroundColor: "#f5f5f5",
+          },
+          header: {
+            backgroundColor: "#3f51b5",
+            color: "#fff",
+          },
+          row: {
+            "&:nth-of-type(odd)": {
+              backgroundColor: "#fff",
+            },
+            "&:nth-of-type(even)": {
+              backgroundColor: "#f5f5f5",
+            },
+          },
+        },
+      },
+    },
+  });
+  const dark = createTheme({
+    palette: {
+      mode: "dark",
+    },
+    components: {
+      MuiDataGrid: {
+        defaultProps: {
+          localeText: {
+            // Texto de localización personalizado en español
+            // Aquí se pueden agregar más traducciones personalizadas según sea necesario
+            columns: "Columnas",
+            rowsPerPage: "Filas por página:",
+            noResults: "No se encontraron resultados",
+
+            footerRowSelected: (count) =>
+              count !== 1
+                ? `${count.toLocaleString()} filas seleccionadas`
+                : `${count.toLocaleString()} fila seleccionada`,
+          },
+        },
+      },
+    },
+  });
+
   const eliminar = () => {
     // console.log(trabajadorSeleccionado.row.id);
   };
@@ -201,7 +247,7 @@ const Colilla = () => {
                 onClick={onClickDelete}
                 size="small"
               >
-                <DeleteIcon />
+                <DeleteIcon color="primary" />
               </IconButton>
             </Tooltip>
           </>
@@ -240,18 +286,57 @@ const Colilla = () => {
       <DashboardNavbar />
 
       <Box sx={{ height: "60vh", width: "100%" }}>
-        <DataGrid
-          pagination
-          pageSize={10}
-          rowsPerPageOptions={[5]}
-          density="compact"
-          components={{
-            Pagination: CustomPagination,
-            Toolbar: CustomToolbar,
-          }}
-          rows={rows}
-          columns={columns}
-        />
+        {rows ? (
+          <ThemeProvider theme={darkMode ? dark : ligth}>
+            <DataGrid
+              pagination
+              pageSize={10}
+              density="compact"
+              components={{
+                Toolbar: CustomToolbar,
+              }}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 10,
+                  },
+                },
+              }}
+              pageSizeOptions={[10, 25, 50]}
+              rows={rows}
+              columns={columns}
+              sx={{
+                "& .MuiDataGrid-virtualScroller::-webkit-scrollbar": {
+                  width: "0.4rem",
+                  height: "0.4rem",
+                },
+                "& .MuiDataGrid-virtualScroller::-webkit-scrollbar-track": {
+                  background: "transparent",
+                  borderRadius: "1rem",
+                },
+                "& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#888",
+                  borderRadius: "1rem",
+                },
+                "& .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb:hover":
+                  {
+                    background: "#555",
+                  },
+              }}
+            />
+          </ThemeProvider>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              height: "50vh",
+              justifyContent: "center",
+              alignItems: "cen",
+            }}
+          >
+            <MDTypography variant="h2">Sin Datos</MDTypography>
+          </div>
+        )}
       </Box>
       <br />
       <br />
