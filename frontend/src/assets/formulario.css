@@ -1,0 +1,13 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.form h2 {
+  margin-bottom: -1rem;
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+}
