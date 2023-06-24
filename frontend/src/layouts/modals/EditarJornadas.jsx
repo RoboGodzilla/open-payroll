@@ -28,7 +28,7 @@ const EditarJornadas = ({
   const [errorHoras, setErrorHoras] = useState(false);
   const [errorHorasDisponibles, setErrorHorasDisponibles] = useState(false);
   const [horasDisponibles, setHorasDisponibles] = useState(null);
-  const [data, setData] = useState(null);
+  const [errorMulta, setErrorMulta] = useState(false);
 
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
@@ -69,6 +69,7 @@ const EditarJornadas = ({
       ...form,
       [name]: value,
     }));
+    verifyHorasExtras();
   };
   const getIdEmpleado = async (id) => {
     const a = await getJornadaById(id);
@@ -99,7 +100,6 @@ const EditarJornadas = ({
   };
   const verifyHorasExtras = async () => {
     let contador = 0;
-    let validation = false;
     const a = await getJornadas();
     const b = a.data;
     const jornadasTrabajador = [];
@@ -111,21 +111,18 @@ const EditarJornadas = ({
         contador = contador + Number(el.horas_extra);
     });
     if (contador < 9) {
-      const cantidad = 9 - contador;
+      const cantidad = contador ? 9 - contador : 9;
       setHorasDisponibles(cantidad);
-      setData(true);
-      validation = true;
-    } else {
-      validation = false;
     }
-    return validation;
   };
   const handleUpdate = () => {
     if (form.horas_extra >= 0 && form.horas_extra <= 3) {
+      verifyHorasExtras();
       setErrorHoras(false);
-      if (verifyHorasExtras() && horasDisponibles >= form.horas_extra) {
+      if (horasDisponibles >= form.horas_extra) {
         setErrorHorasDisponibles(false);
         if (form.multa >= 0) {
+          setErrorMulta(false);
           abrirModalEditar();
           upJornada(form);
           Swal.fire({
@@ -134,6 +131,8 @@ const EditarJornadas = ({
             showConfirmButton: false,
             timer: 1500,
           });
+        } else {
+          setErrorMulta(true);
         }
       } else {
         setErrorHorasDisponibles(true);
@@ -145,7 +144,7 @@ const EditarJornadas = ({
 
   useEffect(() => {
     getIdEmpleado(form.id);
-  }, [data]);
+  }, []);
   const BODY = (
     <div className={darkMode ? "modal dark" : "modal ligth"}>
       <MDTypography variant="h3">
@@ -213,12 +212,19 @@ const EditarJornadas = ({
           </p>
         </MDTypography>
       )}
+      {errorMulta && (
+        <MDTypography variant="h6">
+          <p style={{ color: "#ff4040" }}>
+            La multa debe tener un valor positivo
+          </p>
+        </MDTypography>
+      )}
       {errorHorasDisponibles && (
         <MDTypography variant="h6">
           <p style={{ color: "#ff4040" }}>
             El Artículo 58. Solo permite 9 hrs a la semana,{" "}
             {horasDisponibles
-              ? `el trabajador solo tiene ${horasDisponibles} hrs extras disponibles`
+              ? `el trabajador tiene ${horasDisponibles} hrs extras disponibles`
               : "el trabajador ya no dispone de horas extras disponibles"}
           </p>
         </MDTypography>
