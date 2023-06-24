@@ -1,13 +1,22 @@
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, Chip, createTheme, ThemeProvider } from "@mui/material";
 import EditarJornadas from "../../layouts/modals/EditarJornadas";
-import { getJornadas, updateJornada } from "../../api/jornadas/jornadas";
-import { getTrabajadorById } from "../../api/trabajadores/trabajadores";
+import {
+  addJornada,
+  deleteJornada,
+  getJornadas,
+  updateJornada,
+} from "../../api/jornadas/jornadas";
+import {
+  getTrabajadorById,
+  getTrabajadores,
+} from "../../api/trabajadores/trabajadores";
 import { useEffect, useState } from "react";
 import { useMaterialUIController } from "../../context";
 import JornadasActions from "./JornadasActions";
 import dayjs from "dayjs";
-
+import { v4 as uuid } from "uuid";
+import Swal from "sweetalert2";
 function CreateDataElement(
   id,
   nombre,
@@ -39,6 +48,7 @@ const JornadasTable = () => {
   const [data, setData] = useState(null);
   const [trabajadores, setTrabajadores] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [exists, setExists] = useState(null);
 
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
@@ -90,8 +100,8 @@ const JornadasTable = () => {
     },
   });
 
-  const upJornada = async (data) => {
-    await updateJornada(data);
+  const upJornada = async (DATA) => {
+    await updateJornada(DATA);
     setData(!data);
   };
 
@@ -215,6 +225,36 @@ const JornadasTable = () => {
       id,
     };
   };
+  // const createJornadas = async () => {
+  //   const response = await getTrabajadores();
+  //   const trabajadores = response.data;
+  //   const trabajadoresActivos = [];
+  //   let exists = false;
+  //   trabajadores.map((el) => {
+  //     if (el.is_active) trabajadoresActivos.push(el);
+  //   });
+  //   const datos = await getJornadas();
+  //   datos.data.map((content) => {
+  //     if (content.fecha === dayjs(Date.now()).format("YYYY-MM-DD").toString()) {
+  //       exists = true;
+  //     }
+  //   });
+  //   if (!exists) {
+  //     trabajadoresActivos.map(async (el) => {
+  //       await addJornada({
+  //         id: uuid(),
+  //         fecha: dayjs(Date.now()).format("YYYY-MM-DD"),
+  //         feriado: false,
+  //         septimo_dia: false,
+  //         vacaciones: false,
+  //         ausencia: false,
+  //         horas_extra: 0,
+  //         multa: 0,
+  //         empleado: el.id,
+  //       });
+  //     });
+  //   }
+  // };
   const getData = async () => {
     setTrabajadores([]);
     setLoading(true);
@@ -231,6 +271,7 @@ const JornadasTable = () => {
         if (
           content.fecha === dayjs(Date.now()).format("YYYY-MM-DD").toString()
         ) {
+          setExists(true);
           let a = trabajadores.find((el) => el.id === content.empleado);
           if (!a) a = trabajadores.find((el) => el.id === content.empleado);
           filas.push(
@@ -246,16 +287,58 @@ const JornadasTable = () => {
               content.multa
             )
           );
+        } else {
+          setExists(false);
         }
       });
+      setData(false);
+      if (exists === false) {
+        const response = await getTrabajadores();
+        const trabajadores = response.data;
+        const trabajadoresActivos = [];
+        await trabajadores.map((el) => {
+          if (el.is_active) trabajadoresActivos.push(el);
+        });
+
+        trabajadoresActivos.map(async (el) => {
+          await addJornada({
+            id: uuid(),
+            fecha: dayjs(Date.now()).format("YYYY-MM-DD"),
+            feriado: false,
+            septimo_dia: false,
+            vacaciones: false,
+            ausencia: false,
+            horas_extra: 0,
+            multa: 0,
+            empleado: el.id,
+          });
+        });
+        Swal.fire({
+          icon: "success",
+          title: `Jornadas del ${dayjs(Date.now())
+            .format("YYYY-MM-DD")
+            .toString()} Creadas Exitosamente`,
+          confirmButtonAriaLabel: "OK",
+        }).then(() => {
+          window.location.reload();
+        });
+      }
+
+      // !filas[0] != null && createJornadas();
     }
     setRows(filas);
     setLoading(false);
-    setData(true);
   };
-
+  const delJornadas = async () => {
+    const datos = await getJornadas();
+    const jornadas = datos.data;
+    jornadas.map(async (el) => {
+      if (el.fecha === "2023-06-24") await deleteJornada(el.id);
+    });
+  };
   useEffect(() => {
     getData();
+    // delJornadas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
