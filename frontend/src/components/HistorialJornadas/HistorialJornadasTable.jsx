@@ -89,8 +89,8 @@ const HistorialJornadasTable = () => {
     },
   });
 
-  const upJornada = async (data) => {
-    await updateJornada(data);
+  const upJornada = async (DATA) => {
+    await updateJornada(DATA);
     setData(!data);
   };
 
