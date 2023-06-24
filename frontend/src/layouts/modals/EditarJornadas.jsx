@@ -11,7 +11,7 @@ import MDTypography from "../../components/MDTypography";
 import Switch from "@mui/material/Switch";
 import MDButton from "../../components/MDButton";
 import { useMaterialUIController } from "../../context";
-import { getJornadaById } from "../../api/jornadas/jornadas";
+import { getJornadaById, getJornadas } from "../../api/jornadas/jornadas";
 
 const EditarJornadas = ({
   modalEditar,
@@ -20,11 +20,15 @@ const EditarJornadas = ({
   JornadaSeleccionada,
 }) => {
   const [form, setForm] = useState(JornadaSeleccionada.row);
-  const [value, setValue] = React.useState(form.fecha);
+  const [value] = React.useState(form.fecha);
   const [valueFeriado, setValueFeriado] = React.useState(form.feriado);
   const [valueSeptimo, setValueSeptimo] = React.useState(form.septimo_dia);
   const [valueVacaciones, setValueVacaciones] = React.useState(form.vacaciones);
   const [valueAusencia, setValueAusencia] = React.useState(form.ausencia);
+  const [errorHoras, setErrorHoras] = useState(false);
+  const [errorHorasDisponibles, setErrorHorasDisponibles] = useState(false);
+  const [horasDisponibles, setHorasDisponibles] = useState(null);
+  const [data, setData] = useState(null);
 
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
@@ -70,12 +74,78 @@ const EditarJornadas = ({
     const a = await getJornadaById(id);
     setForm({ ...form, empleado: a.data.empleado });
   };
-  // const handleClick = () => {
-  //   updateData(form);
-  // };
+  function takeYear(theDate) {
+    var x = theDate.getYear();
+    var y = x % 100;
+    y += y < 38 ? 2000 : 1900;
+    return y;
+  }
+  const getWeek = (date) => {
+    var today = new Date(date);
+    var Year = takeYear(today);
+    var Month = today.getMonth();
+    var Day = today.getDate();
+    var now = Date.UTC(Year, Month, Day + 1, 0, 0, 0);
+    var Firstday = new Date();
+    Firstday.setYear(Year);
+    Firstday.setMonth(0);
+    Firstday.setDate(1);
+    var then = Date.UTC(Year, 0, 1, 0, 0, 0);
+    var Compensation = Firstday.getDay();
+    if (Compensation > 3) Compensation -= 4;
+    else Compensation += 3;
+    var NumberOfWeek = Math.round(((now - then) / 86400000 + Compensation) / 7);
+    return NumberOfWeek;
+  };
+  const verifyHorasExtras = async () => {
+    let contador = 0;
+    let validation = false;
+    const a = await getJornadas();
+    const b = a.data;
+    const jornadasTrabajador = [];
+    b.map((el) => {
+      if (el.empleado === form.empleado) jornadasTrabajador.push(el);
+    });
+    jornadasTrabajador.map((el) => {
+      if (getWeek(el.fecha) === getWeek(form.fecha))
+        contador = contador + Number(el.horas_extra);
+    });
+    if (contador < 9) {
+      const cantidad = 9 - contador;
+      setHorasDisponibles(cantidad);
+      setData(true);
+      validation = true;
+    } else {
+      validation = false;
+    }
+    return validation;
+  };
+  const handleUpdate = () => {
+    if (form.horas_extra >= 0 && form.horas_extra <= 3) {
+      setErrorHoras(false);
+      if (verifyHorasExtras() && horasDisponibles >= form.horas_extra) {
+        setErrorHorasDisponibles(false);
+        if (form.multa >= 0) {
+          abrirModalEditar();
+          upJornada(form);
+          Swal.fire({
+            icon: "success",
+            title: "Jornada Actualizada Exitosamente",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      } else {
+        setErrorHorasDisponibles(true);
+      }
+    } else {
+      setErrorHoras(true);
+    }
+  };
+
   useEffect(() => {
     getIdEmpleado(form.id);
-  }, []);
+  }, [data]);
   const BODY = (
     <div className={darkMode ? "modal dark" : "modal ligth"}>
       <MDTypography variant="h3">
@@ -135,20 +205,29 @@ const EditarJornadas = ({
         onChange={handleChange}
         value={form && form.multa}
       />
+      {errorHoras && (
+        <MDTypography variant="h6">
+          <p style={{ color: "#ff4040" }}>
+            Las horas deben ser positivas y el Artículo 58. Solo permite 3 hrs
+            por día
+          </p>
+        </MDTypography>
+      )}
+      {errorHorasDisponibles && (
+        <MDTypography variant="h6">
+          <p style={{ color: "#ff4040" }}>
+            El Artículo 58. Solo permite 9 hrs a la semana,{" "}
+            {horasDisponibles
+              ? `el trabajador solo tiene ${horasDisponibles} hrs extras disponibles`
+              : "el trabajador ya no dispone de horas extras disponibles"}
+          </p>
+        </MDTypography>
+      )}
       <div className="btns">
         <MDButton
           color="success"
           variant="gradient"
-          onClick={() => {
-            abrirModalEditar();
-            upJornada(form);
-            Swal.fire({
-              icon: "success",
-              title: "Jornada Actualizada Exitosamente",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-          }}
+          onClick={() => handleUpdate()}
         >
           Guardar
         </MDButton>
