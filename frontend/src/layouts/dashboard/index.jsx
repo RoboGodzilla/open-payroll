@@ -50,7 +50,11 @@ const Dashboard = () => {
           <p style={{ color: "transparent" }}>a</p>Historial Colillas
         </MDButton>
       </div>
-      {verJornadas && <HistorialJornadasTable />}
+      {verJornadas && (
+        <div style={{ height: "73vh" }}>
+          <HistorialJornadasTable />
+        </div>
+      )}
       <Footer />
     </DashboardLayout>
   );
