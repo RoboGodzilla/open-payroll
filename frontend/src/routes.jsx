@@ -6,13 +6,16 @@ import WorkIcon from "@mui/icons-material/Work";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import RequestPageIcon from "@mui/icons-material/RequestPage";
 import ArticleIcon from "@mui/icons-material/Article";
+import GroupsIcon from "@mui/icons-material/Groups";
+
 //
 import HomeIcon from "@mui/icons-material/Home";
-import Trabajadores from "./components/Trabajadores";
-import Jornadas from "./components/Jornadas";
+import Trabajadores from "./components/Trabajadores/Trabajadores";
+import Jornadas from "./components/Jornadas/Jornadas";
 import Colilla from "./components/Colilla";
 import Planilla from "./components/Planilla";
 import Formulario from "./components/Formulario";
+import Grupos from "./components/Grupos/Grupos";
 
 const routes = [
   {
@@ -41,6 +44,14 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Grupos",
+    key: "grupos",
+    icon: <GroupsIcon />,
+    route: "/grupos",
+    component: <Grupos />,
+  },
+  {
+    type: "collapse",
     name: "Jornadas",
     key: "jornadas",
     icon: <WorkIcon />,
@@ -63,6 +74,10 @@ const routes = [
     route: "/planilla",
     component: <Planilla />,
   },
+  // {
+  //   route: "/jijija",
+  //   component: <p>jijija</p>,
+  // },
 ];
 
 export default routes;
