@@ -14,4 +14,8 @@ class NominaViewSet(viewsets.ModelViewSet):
 class PlanillaViewSet(viewsets.ModelViewSet):
     queryset = Planilla.objects.all()
     serializer_class = PlanillaSerializer
+
+class FormulaViewSet(viewsets.ModelViewSet):
+    queryset = Formula.objects.all()
+    serializer_class = FormulaSerializer
     
