@@ -15,6 +15,11 @@ class Jornada(models.Model):
     horas_extra = models.DecimalField(max_digits=2, decimal_places=1, default=0)
     multa = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
+class Formula(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=100)
+    formula = models.JSONField()
+    
 class Nomina(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     fecha_inicial = models.DateField()
@@ -23,17 +28,10 @@ class Nomina(models.Model):
     vacaciones = models.BooleanField(default=False)
     aguinaldo = models.BooleanField(default=False)
     jornadas = models.ManyToManyField(Jornada)
-    prestaciones = models.ManyToManyField('formulas.Prestaciones')
-    deducciones = models.ManyToManyField('formulas.Deducciones')
-    viaticos = models.ManyToManyField('formulas.Viaticos')
+    formulas = models.ManyToManyField('Formula')
     salario = models.DecimalField(max_digits=10, decimal_places=2)
-    calculo_prestaciones = ArrayField(base_field=models.DecimalField(max_digits=10, decimal_places=2))
-    calculo_deducciones = ArrayField(base_field=models.DecimalField(max_digits=10, decimal_places=2))
-    calculo_viaticos = ArrayField(base_field=models.DecimalField(max_digits=10, decimal_places=2))
-    total_prestaciones = models.DecimalField(max_digits=10, decimal_places=2)
-    total_deducciones = models.DecimalField(max_digits=10, decimal_places=2)
-    total_viaticos = models.DecimalField(max_digits=10, decimal_places=2)
-    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    calculos = ArrayField(base_field=models.DecimalField(max_digits=10, decimal_places=2))
+    totales = ArrayField(base_field=models.DecimalField(max_digits=10, decimal_places=2))
 
 class Planilla(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -42,9 +40,4 @@ class Planilla(models.Model):
     vacaciones = models.BooleanField(default=False)
     aguinaldo = models.BooleanField(default=False)
     viaticos = models.BooleanField(default=False)
-    nomina = models.ManyToManyField(Nomina)
-    total_salarios = models.DecimalField(max_digits=10, decimal_places=2)
-    total_prestaciones = models.DecimalField(max_digits=10, decimal_places=2)
-    total_deducciones = models.DecimalField(max_digits=10, decimal_places=2)
-    total_viaticos = models.DecimalField(max_digits=10, decimal_places=2)
-    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    nominas = models.ManyToManyField(Nomina)
