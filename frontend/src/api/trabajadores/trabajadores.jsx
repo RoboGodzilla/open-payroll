@@ -1,6 +1,7 @@
 import axios from "../config";
 
 export const getTrabajadores = () => axios.get("empleados/");
+export const getTrabajadorById = (id) => axios.get(`empleados/${id}/`);
 
 export const addTrabajador = (payload) => axios.post("empleados/", payload);
 

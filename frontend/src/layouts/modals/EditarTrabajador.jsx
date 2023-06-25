@@ -1,5 +1,6 @@
-import { Button, Modal, TextField } from "@mui/material";
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import { Modal, TextField } from "@mui/material";
+import { useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -9,6 +10,7 @@ import dayjs from "dayjs";
 import MDTypography from "../../components/MDTypography";
 import Switch from "@mui/material/Switch";
 import MDButton from "../../components/MDButton";
+import { useMaterialUIController } from "../../context";
 
 const EditarTrabajador = ({
   modalEditar,
@@ -17,8 +19,16 @@ const EditarTrabajador = ({
   trabajadorSeleccionado,
 }) => {
   const [form, setForm] = useState(trabajadorSeleccionado.row);
-  const [value, setValue] = React.useState(form.fecha_contratacion);
-  const [valueRG, setValueRG] = React.useState(form.is_active);
+  // eslint-disable-next-line no-unused-vars
+  const [value, setValue] = useState(form.fecha_contratacion);
+  const [valueRG, setValueRG] = useState(form.is_active);
+  const [campos, setCampos] = useState(false);
+  const [length, setLength] = useState(false);
+  const [salario, setSalario] = useState(false);
+  const [errorVacaciones, setErrorVacaciones] = useState(false);
+
+  const [controller] = useMaterialUIController();
+  const { darkMode } = controller;
 
   const handleChangeActive = () => {
     setValueRG(!valueRG);
@@ -36,9 +46,45 @@ const EditarTrabajador = ({
     }));
   };
 
+  const handleUpdate = () => {
+    if (
+      form.nombre != "" &&
+      form.apellido != "" &&
+      form.numero_seguro_social != 0 &&
+      form.salario != 0
+    ) {
+      setCampos(false);
+      if (form.numero_seguro_social.length !== 8) {
+        setLength(true);
+      } else {
+        setLength(false);
+        if (form.salario > 0) {
+          setSalario(false);
+          if (form.cont_vacaciones >= 0 && form.cont_vacaciones <= 30) {
+            setErrorVacaciones(false);
+            abrirModalEditar();
+            upTrabajador(form);
+            Swal.fire({
+              icon: "success",
+              title: "Trabajador Actualizado Exitosamente",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          } else {
+            setErrorVacaciones(true);
+          }
+        } else {
+          setSalario(true);
+        }
+      }
+    } else {
+      setCampos(true);
+    }
+  };
+
   const BODY = (
-    <div className="modal">
-      <h3>Editando Trabajador</h3>
+    <div className={darkMode ? "modal dark" : "modal ligth"}>
+      <MDTypography variant="h3">Editando Trabajador</MDTypography>
       <TextField
         name="nombre"
         label="Nombres"
@@ -89,21 +135,37 @@ const EditarTrabajador = ({
 
         <Switch checked={valueRG} onChange={() => handleChangeActive()} />
       </div>
-      <br />
+      {campos && (
+        <MDTypography variant="h6">
+          <p style={{ color: "#ff4040" }}>Debe llenar todos los campos</p>
+        </MDTypography>
+      )}
+      {length && (
+        <MDTypography variant="h6">
+          <p style={{ color: "#ff4040" }}>
+            El número INSS debe contener 8 digitos
+          </p>
+        </MDTypography>
+      )}
+      {salario && (
+        <MDTypography variant="h6">
+          <p style={{ color: "#ff4040" }}>El salario debe ser mayor a 0</p>
+        </MDTypography>
+      )}
+      {errorVacaciones && (
+        <MDTypography variant="h6">
+          <p style={{ color: "#ff4040" }}>
+            Las vacaciones deben tener un valor positvo y su valor maximo es de
+            30
+          </p>
+        </MDTypography>
+      )}
+
       <div className="btns">
         <MDButton
           color="success"
           variant="gradient"
-          onClick={() => {
-            abrirModalEditar();
-            upTrabajador(form);
-            Swal.fire({
-              icon: "success",
-              title: "Trabajador Actualizado Exitosamente",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-          }}
+          onClick={() => handleUpdate()}
         >
           Guardar
         </MDButton>
@@ -125,11 +187,7 @@ const EditarTrabajador = ({
       </div>
     </div>
   );
-  return (
-    <Modal open={modalEditar} onClose={abrirModalEditar}>
-      {BODY}
-    </Modal>
-  );
+  return <Modal open={modalEditar}>{BODY}</Modal>;
 };
 
 export default EditarTrabajador;

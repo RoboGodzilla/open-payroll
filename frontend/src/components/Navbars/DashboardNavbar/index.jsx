@@ -12,7 +12,7 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
-import SettingsIcon from "@mui/icons-material/Settings";
+import HelpIcon from "@mui/icons-material/Help";
 import { Tooltip } from "@mui/material";
 
 // Material Dashboard 2 React components
@@ -35,19 +35,12 @@ import {
   useMaterialUIController,
   setTransparentNavbar,
   setMiniSidenav,
-  setOpenConfigurator,
 } from "../../../context";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
-  const {
-    miniSidenav,
-    transparentNavbar,
-    fixedNavbar,
-    openConfigurator,
-    darkMode,
-  } = controller;
+  const { miniSidenav, transparentNavbar, fixedNavbar, darkMode } = controller;
 
   const route = useLocation().pathname.split("/").slice(1);
 
@@ -81,8 +74,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
   }, [dispatch, fixedNavbar]);
 
   const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
-  const handleConfiguratorOpen = () =>
-    setOpenConfigurator(dispatch, !openConfigurator);
 
   // Styles for the navbar icons
   const iconsStyle = ({
@@ -146,10 +137,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 disableRipple
                 color="inherit"
                 sx={navbarIconButton}
-                onClick={handleConfiguratorOpen}
+                target="_blank"
+                href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
               >
-                <Tooltip title="Ajustes" arrow>
-                  <SettingsIcon fontSize="medium" sx={iconsStyle} />
+                <Tooltip title="Ayuda" arrow>
+                  <HelpIcon fontSize="medium" sx={iconsStyle} />
                 </Tooltip>
               </IconButton>
             </MDBox>
