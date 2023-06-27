@@ -3,7 +3,7 @@ from .models import Jornada, Nomina, Planilla, Formula
 from empleados.serializers import EmpleadoSerializer
 
 class JornadaSerializer(serializers.ModelSerializer):
-    empleado = EmpleadoSerializer()
+    empleadoinfo = EmpleadoSerializer(source='empleado', read_only=True)
     class Meta:
         model = Jornada
         fields = '__all__'
