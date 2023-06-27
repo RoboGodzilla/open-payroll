@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from .models import Jornada, Nomina, Planilla, Formula
+from empleados.serializers import EmpleadoSerializer
 
 class JornadaSerializer(serializers.ModelSerializer):
+    empleado = EmpleadoSerializer()
     class Meta:
         model = Jornada
         fields = '__all__'
