@@ -8,6 +8,7 @@ class EmpleadoSerializer(serializers.ModelSerializer):
 
 
 class GrupoSerializer(serializers.ModelSerializer):
+    empleadoinfo = EmpleadoSerializer(source='empleados', read_only=True, many=True)
     class Meta:
         model = Grupo
         fields = '__all__'
