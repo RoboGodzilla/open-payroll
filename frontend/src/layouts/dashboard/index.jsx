@@ -1,4 +1,3 @@
-// Material Dashboard 2 React example components
 import DashboardLayout from "../../components/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "../../components/Navbars/DashboardNavbar";
 import MDButton from "../../components/MDButton";
@@ -8,6 +7,8 @@ import { useState } from "react";
 
 import Footer from "../../components/Footer";
 import HistorialJornadasTable from "../../components/HistorialJornadas/HistorialJornadasTable";
+import { Button } from "@mui/material";
+import HistorialColillaTable from "../../components/HistorialColilla/HistorialColillaTable";
 
 const Dashboard = () => {
   const [verJornadas, setVerJornadas] = useState(false);
@@ -25,9 +26,12 @@ const Dashboard = () => {
     <DashboardLayout>
       <DashboardNavbar />
       <div style={{ marginBottom: "1rem", display: "flex", gap: "1rem" }}>
-        <MDButton
-          color={!verJornadas ? "success" : "error"}
-          variant="gradient"
+        <Button
+          style={{
+            background: !verJornadas ? "#4caf50" : "#f44336",
+            color: "white",
+          }}
+          variant="contained"
           onClick={() => handleJornadas()}
         >
           {!verJornadas ? (
@@ -35,8 +39,9 @@ const Dashboard = () => {
           ) : (
             <VisibilityOffIcon fontSize="medium" />
           )}
-          <p style={{ color: "transparent" }}>a</p>Historial Jornadas
-        </MDButton>
+          <p style={{ color: "transparent" }}>a</p>
+          Historial de Jornadas
+        </Button>
         <MDButton
           color={!verColillas ? "success" : "error"}
           variant="gradient"
@@ -53,6 +58,11 @@ const Dashboard = () => {
       {verJornadas && (
         <div style={{ height: "73vh" }}>
           <HistorialJornadasTable />
+        </div>
+      )}
+      {verColillas && (
+        <div style={{ height: "73vh" }}>
+          <HistorialColillaTable />
         </div>
       )}
       <Footer />

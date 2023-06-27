@@ -22,6 +22,7 @@ const EditarGrupo = ({
   setData,
 }) => {
   const [form, setForm] = useState(grupoSeleccionado);
+  const [formCopia, setFormCopia] = useState(grupoSeleccionado);
   const [trabajadores, setTrabajadores] = useState([]);
   const [trabajadoresId, setTrabajadoresId] = useState([]);
   const [controller] = useMaterialUIController();
@@ -42,17 +43,31 @@ const EditarGrupo = ({
       setErrorCampos(false);
       if (form.empleados.length >= 2) {
         setErrorEmpleados(false);
-        await updateGrupo(form);
-        setModalEditar(!modalEditar);
-        Swal.fire({
-          icon: "success",
-          title: "Grupo Actualizado Exitosamente",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          setData(!data);
-          window.location.reload();
-        });
+        if (
+          formCopia.nombre === form.nombre &&
+          formCopia.descripcion === form.descripcion &&
+          formCopia.empleados === form.empleados
+        ) {
+          setModalEditar(!modalEditar);
+          Swal.fire({
+            icon: "success",
+            title: "No Se Han Detectado Cambios",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          await updateGrupo(form);
+          setModalEditar(!modalEditar);
+          Swal.fire({
+            icon: "success",
+            title: "Grupo Actualizado Exitosamente",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => {
+            setData(!data);
+            window.location.reload();
+          });
+        }
       } else {
         setErrorEmpleados(true);
       }
@@ -62,7 +77,13 @@ const EditarGrupo = ({
   };
   const getData = async () => {
     const datos = await getTrabajadores();
-    setTrabajadores(datos.data);
+    const data = datos.data;
+    let a = [];
+    data.map((el) => {
+      if (el.is_active) a.push(el);
+    });
+    setTrabajadores(a);
+    // // setTrabajadores(datos.data);
   };
   const onSelectTag = (value) => {
     const arr = [];

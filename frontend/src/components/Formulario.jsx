@@ -50,7 +50,7 @@ const Formulario = () => {
         </div>
       </form>
       <div
-        className="btn"
+        className="btn-formulario"
         style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}
       >
         <MDButton

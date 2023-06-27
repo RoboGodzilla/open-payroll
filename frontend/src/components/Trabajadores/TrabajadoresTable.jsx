@@ -6,7 +6,6 @@ import AgregarTrabajador from "../../layouts/modals/AgregarTrabajador";
 import {
   getTrabajadores,
   addTrabajador,
-  updateTrabajador,
 } from "../../api/trabajadores/trabajadores";
 import { useEffect, useState } from "react";
 import MDButton from "../MDButton";
@@ -112,9 +111,8 @@ const TrabajadoresTable = () => {
     setData(data);
   };
 
-  const upTrabajador = async (data) => {
-    await updateTrabajador(data);
-    setData(data);
+  const upTrabajador = () => {
+    setData(!data);
   };
   const abrirModalAgregar = () => {
     setModalAgregar(!modalAgregar);
@@ -124,8 +122,8 @@ const TrabajadoresTable = () => {
     setModalEditar(!modalEditar);
   };
   const columns = [
-    { field: "nombre", headerName: "Nombres", width: 150 },
-    { field: "apellido", headerName: "Apellidos", width: 150 },
+    { field: "nombre", headerName: "Nombres", width: 200 },
+    { field: "apellido", headerName: "Apellidos", width: 200 },
     { field: "numero_seguro_social", headerName: "Número INSS", width: 150 },
     { field: "salario", headerName: "Salario Base", width: 150 },
     { field: "fecha_contratacion", headerName: "Fecha Contrato", width: 150 },
@@ -133,11 +131,15 @@ const TrabajadoresTable = () => {
       field: "cont_vacaciones",
       headerName: "Vacaciones(días)",
       width: 150,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "is_active",
       headerName: "Estado",
       width: 120,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => {
         const valor = params.row.is_active;
         return (
@@ -203,7 +205,7 @@ const TrabajadoresTable = () => {
   }, [data]);
 
   return (
-    <Box sx={{ height: "65vh", width: "95%" }}>
+    <Box sx={{ height: "65vh", width: "100%" }}>
       <div>
         <MDButton
           color="success"

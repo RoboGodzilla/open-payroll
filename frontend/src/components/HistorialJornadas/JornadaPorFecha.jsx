@@ -1,23 +1,11 @@
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, Chip, createTheme, ThemeProvider } from "@mui/material";
 import EditarJornadas from "../../layouts/modals/EditarJornadas";
-import {
-  addJornada,
-  deleteJornada,
-  getJornadas,
-  updateJornada,
-} from "../../api/jornadas/jornadas";
-import { getTrabajadores } from "../../api/trabajadores/trabajadores";
+import { getJornadas, updateJornada } from "../../api/jornadas/jornadas";
 import { useEffect, useState } from "react";
 import { useMaterialUIController } from "../../context";
-import JornadasActions from "./JornadasActions";
-import dayjs from "dayjs";
-import { v4 as uuid } from "uuid";
-import Swal from "sweetalert2";
-import MDButton from "../MDButton";
-import RotateLeftIcon from "@mui/icons-material/RotateLeft";
-import axios from "axios";
-import MDTypography from "../MDTypography";
+import JornadasActions from "../../components/Jornadas/JornadasActions";
+
 function CreateDataElement(
   id,
   nombre,
@@ -41,18 +29,16 @@ function CreateDataElement(
     multa,
   };
 }
-let FERIADOS = null;
-const JornadasTable = () => {
+
+const JornadaPorFecha = ({ FechaFiltro }) => {
   const [rows, setRows] = useState([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [JornadaSeleccionada, setJornadaSeleccionada] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [exists, setExists] = useState(null);
 
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
-
   const ligth = createTheme({
     components: {
       MuiDataGrid: {
@@ -108,12 +94,15 @@ const JornadasTable = () => {
   const abrirModalEditar = () => {
     setModalEditar(!modalEditar);
   };
+
   const columns = [
     { field: "nombre", headerName: "Trabajador", width: 300 },
     { field: "fecha", headerName: "Fecha", width: 120 },
+
     {
       field: "feriado",
       headerName: "Feriado",
+      filterable: false,
       width: 110,
       renderCell: (params) => {
         const valor = params.row.feriado;
@@ -136,6 +125,7 @@ const JornadasTable = () => {
     {
       field: "septimo_dia",
       headerName: "Séptimo",
+      filterable: false,
       width: 110,
       renderCell: (params) => {
         const valor = params.row.septimo_dia;
@@ -158,6 +148,7 @@ const JornadasTable = () => {
     {
       field: "vacaciones",
       headerName: "Vacaciones",
+      filterable: false,
       width: 110,
       renderCell: (params) => {
         const valor = params.row.vacaciones;
@@ -180,6 +171,7 @@ const JornadasTable = () => {
     {
       field: "ausencia",
       headerName: "Ausencia",
+      filterable: false,
       width: 110,
       renderCell: (params) => {
         const valor = params.row.ausencia;
@@ -205,6 +197,7 @@ const JornadasTable = () => {
       field: "actions",
       headerName: "Acciones",
       sortable: false,
+      filterable: false,
       width: 120,
       renderCell: (params) => (
         <JornadasActions
@@ -217,18 +210,19 @@ const JornadasTable = () => {
       ),
     },
   ];
+
   const getData = async () => {
     setLoading(true);
     const filas = [];
     let datos = null;
     try {
       datos = await getJornadas();
+    } catch (error) {
+      console.log(error);
+    } finally {
       if (datos.data.id !== null) setData(true);
       datos.data.map((content) => {
-        if (
-          content.fecha === dayjs(Date.now()).format("YYYY-MM-DD").toString()
-        ) {
-          setExists(true);
+        if (content.fecha === FechaFiltro.row.fecha) {
           filas.push(
             CreateDataElement(
               content.id,
@@ -245,119 +239,21 @@ const JornadasTable = () => {
               content.multa
             )
           );
-        } else {
-          setExists(false);
         }
       });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      exists === false && (await createJornadas());
     }
-
     setRows(filas);
     setLoading(false);
   };
-  const delJornadas = async () => {
-    const datos = await getJornadas();
-    const jornadas = datos.data;
-    jornadas.map(async (el) => {
-      if (el.fecha === dayjs(Date.now()).format("YYYY-MM-DD").toString())
-        await deleteJornada(el.id);
-    });
-  };
-  const createJornadas = async () => {
-    const response = await getTrabajadores();
-    const trabajadores = response.data;
-    const trabajadoresActivos = [];
-    let feriado = false;
-    await trabajadores.map((el) => {
-      if (el.is_active) trabajadoresActivos.push(el);
-    });
-    FERIADOS.map((el) => {
-      if (el.date === dayjs(Date.now()).format("YYYY-MM-DD").toString)
-        // if (el.date === "2023-05-30")
-        feriado = true;
-    });
 
-    trabajadoresActivos.map(async (el) => {
-      await addJornada({
-        id: uuid(),
-
-        // fecha: "2023-05-30",
-        fecha: dayjs(Date.now()).format("YYYY-MM-DD"),
-        feriado: feriado ? true : false,
-        septimo_dia: false,
-        vacaciones: false,
-        ausencia: false,
-        horas_extra: 0,
-        multa: 0,
-        empleado: el.id,
-      });
-    });
-    Swal.fire({
-      icon: "success",
-      title: `Jornadas del ${dayjs(Date.now())
-        .format("YYYY-MM-DD")
-        .toString()} Creadas Exitosamente`,
-      confirmButtonAriaLabel: "OK",
-    }).then(() => {
-      window.location.reload();
-    });
-  };
-  const Regenerate = () => {
-    Swal.fire({
-      title: "¿Está Seguro?",
-      text: "¡Perderá todos los cambios que haya hecho!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Aceptar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await delJornadas();
-        await createJornadas();
-      }
-    });
-  };
   useEffect(() => {
     getData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
-  useEffect(() => {
-    const getFeriados = async () => {
-      const a = await axios.get(
-        "https://date.nager.at/api/v3/PublicHolidays/2023/NI"
-      );
-      FERIADOS = a.data;
-    };
-    getFeriados();
-  }, []);
+
   return (
     <Box sx={{ height: "65vh", width: "100%" }}>
-      <div
-        style={{
-          marginTop: "-1.5rem",
-          marginBottom: "1rem",
-          display: "flex",
-          gap: "1rem",
-          height: "3rem",
-        }}
-      >
-        <MDButton
-          color="success"
-          variant="gradient"
-          onClick={() => Regenerate()}
-        >
-          <RotateLeftIcon fontSize="medium" />
-          <p style={{ color: "transparent" }}>a</p> Regenerar
-        </MDButton>
-        <MDTypography variant="h4">
-          Jornadas del {dayjs(Date.now()).format("YYYY-MM-DD").toString()}
-        </MDTypography>
-      </div>
       {modalEditar && (
         <EditarJornadas
           abrirModalEditar={abrirModalEditar}
@@ -407,4 +303,4 @@ const JornadasTable = () => {
   );
 };
 
-export default JornadasTable;
+export default JornadaPorFecha;

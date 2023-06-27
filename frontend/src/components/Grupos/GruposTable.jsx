@@ -257,7 +257,7 @@ export default function GruposTable({ cambios, setCambios }) {
             <MDTypography>
               Miembros:{" "}
               {grupoSeleccionado.nombresPorId.map((el, i) => (
-                <li key={i}>{el}</li>
+                <li key={i}>{el.nombre + " " + el.apellido}</li>
               ))}
             </MDTypography>
             <MDTypography>

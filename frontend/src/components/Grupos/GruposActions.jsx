@@ -5,7 +5,7 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { deleteGrupo, getGrupoById, getGrupos } from "../../api/grupos/grupos";
 import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
-import { getTrabajadorById } from "../../api/trabajadores/trabajadores";
+
 import { Delete, Edit } from "@mui/icons-material";
 
 const GruposActions = ({
@@ -18,7 +18,7 @@ const GruposActions = ({
   setModalEditar,
 }) => {
   const [grupo, setgrupo] = useState([]);
-  const [nombres, setNombres] = useState([]);
+
   const [data, setData] = useState(null);
   const eliminar = async (params) => {
     await deleteGrupo(params.row.id);
@@ -26,30 +26,28 @@ const GruposActions = ({
     setCambios(!cambios);
   };
 
-  const nomPorId = (data) => {
-    const a = [];
-    data.map(async (el) => {
-      const nombrePorId = await getTrabajadorById(el);
-      a.push(nombrePorId.data.nombre + " " + nombrePorId.data.apellido);
-    });
-    setNombres(a);
-  };
   const getMiembros = async () => {
     const data = await getGrupos(params);
     setgrupo(data.data);
     grupo.map((el) => {
-      if (el.id === params.row.id) {
-        nomPorId(el.empleados);
-      }
+      setGrupoSeleccionado({
+        ...el,
+        nombresPorId: el.empleadoinfo,
+      });
     });
-    grupo.map((el) => {
-      if (el.id === params.row.id) {
-        setGrupoSeleccionado({
-          ...el,
-          nombresPorId: nombres,
-        });
-      }
-    });
+    // grupo.map((el) => {
+    //   if (el.id === params.row.id) {
+    //     nomPorId(el.empleados);
+    //   }
+    // });
+    // grupo.map((el) => {
+    //   if (el.id === params.row.id) {
+    //     setGrupoSeleccionado({
+    //       ...el,
+    //       nombresPorId: nombres,
+    //     });
+    //   }
+    // });
     setData(true);
   };
   const onClickSee = async (e) => {

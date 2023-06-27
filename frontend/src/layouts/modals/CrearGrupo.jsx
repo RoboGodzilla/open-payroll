@@ -38,7 +38,12 @@ const CrearGrupo = ({ modalCrearGrupo, abrirModalCrearGrupo, createGrupo }) => {
 
   const getData = async () => {
     const datos = await getTrabajadores();
-    setTrabajadores(datos.data);
+    const data = datos.data;
+    let a = [];
+    data.map((el) => {
+      if (el.is_active) a.push(el.nombre + " " + el.apellido);
+    });
+    setTrabajadores(a);
   };
 
   const handleChange = (e) => {
@@ -113,7 +118,7 @@ const CrearGrupo = ({ modalCrearGrupo, abrirModalCrearGrupo, createGrupo }) => {
         options={trabajadores}
         disableCloseOnSelect
         onChange={(e, value) => onSelectTag(value)}
-        getOptionLabel={(option) => option.nombre + " " + option.apellido}
+        getOptionLabel={(option) => option}
         renderOption={(props, option, { selected }) => (
           <li {...props}>
             <Checkbox
@@ -122,7 +127,7 @@ const CrearGrupo = ({ modalCrearGrupo, abrirModalCrearGrupo, createGrupo }) => {
               style={{ marginRight: 8 }}
               checked={selected}
             />
-            {option.nombre + " " + option.apellido}
+            {option}
           </li>
         )}
         renderInput={(params) => <TextField {...params} label="Trabajadores" />}

@@ -1,23 +1,25 @@
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Box, createTheme, ThemeProvider } from "@mui/material";
 import EditarJornadas from "../../layouts/modals/EditarJornadas";
-import { getJornadas, updateJornada } from "../../api/jornadas/jornadas";
+import { updateJornada } from "../../api/jornadas/jornadas";
 import { useEffect, useState } from "react";
 import { useMaterialUIController } from "../../context";
-import JornadaPorFecha from "./JornadaPorFecha";
 
-import HistorialAction from "./HistorialAction";
-import { getTrabajadores } from "../../api/trabajadores/trabajadores";
+import { getNomina } from "../../api/nomina/nomina";
 
-function CreateDataElement(id, fecha, cantidad) {
+import HistorialColillaAction from "./HistorialColillaAction";
+import ColillaPorFecha from "./ColillaPorFecha";
+
+function CreateDataElement(id, fechai, fecha, cantidad) {
   return {
     id,
+    fechai,
     fecha,
     cantidad,
   };
 }
 
-const HistorialJornadasTable = () => {
+const HistorialColillaTable = () => {
   const [rows, setRows] = useState([]);
   const [modalEditar, setModalEditar] = useState(false);
   const [JornadaSeleccionada, setJornadaSeleccionada] = useState(null);
@@ -75,17 +77,33 @@ const HistorialJornadasTable = () => {
     },
   });
 
+  const upJornada = async (DATA) => {
+    await updateJornada(DATA);
+    setData(!data);
+  };
+
+  const abrirModalEditar = () => {
+    setModalEditar(!modalEditar);
+  };
+
   const columns = [
     {
+      field: "fechai",
+      headerName: "Fecha Inicio",
+      width: 250,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
       field: "fecha",
-      headerName: "Fecha",
-      width: 500,
+      headerName: "Fecha Fin",
+      width: 250,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "cantidad",
-      headerName: "Cantidad de Trabajadores que realizaron la jornada",
+      headerName: "Cantidad a Pagar",
       width: 500,
       sortable: false,
       headerAlign: "center",
@@ -100,7 +118,7 @@ const HistorialJornadasTable = () => {
       align: "center",
       width: 120,
       renderCell: (params) => (
-        <HistorialAction
+        <HistorialColillaAction
           {...{ params }}
           setJornadaSeleccionada={setJornadaSeleccionada}
           setVerJornada={setVerJornada}
@@ -109,51 +127,29 @@ const HistorialJornadasTable = () => {
       ),
     },
   ];
-  function contadorElemento(matrizValores, busqueda) {
-    let unaLinea = matrizValores.flat();
-    return unaLinea.filter((elemento) => elemento === busqueda).length;
-  }
 
   const getData = async () => {
     const fechas = [];
     setLoading(true);
     const filas = [];
     let datos = null;
-    let prueba = [];
-    let cantidadTrabajadores = 0;
-    const response = await getTrabajadores();
-    const trabajadores = response.data;
-    trabajadores.map(() => {
-      cantidadTrabajadores++;
-    });
+
+    let cantidadPagar = 0;
     try {
-      datos = await getJornadas();
+      datos = await getNomina();
     } catch (error) {
       console.log(error);
     } finally {
       if (datos.data.id !== null) setData(true);
       datos.data.map((content) => {
-        if (!fechas.find((el) => el === content.fecha)) {
-          fechas.push(content.fecha);
+        if (!fechas.find((el) => el === content.fecha_final)) {
+          fechas.push(content.fecha_final);
         }
-        prueba.push(content.fecha);
+        if (content.fecha_final === "2023-06-30")
+          cantidadPagar += Number(content.totales[1]);
       });
-      const elemenstos = [];
-      fechas.map((el) => {
-        elemenstos.push({
-          fecha: el,
-          completados: contadorElemento(prueba, el),
-        });
-      });
-
-      elemenstos.map((el, i) => {
-        filas.push(
-          CreateDataElement(
-            i,
-            el.fecha,
-            el.completados + "/" + cantidadTrabajadores
-          )
-        );
+      fechas.map((el, i) => {
+        filas.push(CreateDataElement(i, "2023-06-01", el, cantidadPagar));
       });
     }
     setRows(filas);
@@ -206,11 +202,11 @@ const HistorialJornadasTable = () => {
       {verJornada && (
         <div style={{ marginTop: "1rem", height: "80vh" }}>
           {" "}
-          <JornadaPorFecha FechaFiltro={JornadaSeleccionada} />
+          <ColillaPorFecha FechaFiltro={JornadaSeleccionada} />
         </div>
       )}
     </Box>
   );
 };
 
-export default HistorialJornadasTable;
+export default HistorialColillaTable;

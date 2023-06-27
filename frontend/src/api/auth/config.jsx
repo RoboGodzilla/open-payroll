@@ -5,8 +5,8 @@ const token = () => localStorage.getItem("access");
 
 const instance = axios.create({
   // baseURL: "https://openpayroll.herokuapp.com/api/",
-  // baseURL: "http://127.0.0.1:8000/api/",
-  baseURL: "http://ec2-3-143-17-136.us-east-2.compute.amazonaws.com:8000/api/",
+  // baseURL: "http://127.0.0.1:8000/auth/",
+  baseURL: "http://ec2-3-143-17-136.us-east-2.compute.amazonaws.com:8000/auth/",
 });
 
 // Use interceptor to inject the token to requests

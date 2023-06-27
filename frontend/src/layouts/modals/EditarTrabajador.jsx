@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { Modal, TextField } from "@mui/material";
 import { useState } from "react";
@@ -11,6 +12,7 @@ import MDTypography from "../../components/MDTypography";
 import Switch from "@mui/material/Switch";
 import MDButton from "../../components/MDButton";
 import { useMaterialUIController } from "../../context";
+import { updateTrabajador } from "../../api/trabajadores/trabajadores";
 
 const EditarTrabajador = ({
   modalEditar,
@@ -19,7 +21,7 @@ const EditarTrabajador = ({
   trabajadorSeleccionado,
 }) => {
   const [form, setForm] = useState(trabajadorSeleccionado.row);
-  // eslint-disable-next-line no-unused-vars
+  const [formCopia, setFormCopia] = useState(trabajadorSeleccionado.row);
   const [value, setValue] = useState(form.fecha_contratacion);
   const [valueRG, setValueRG] = useState(form.is_active);
   const [campos, setCampos] = useState(false);
@@ -46,7 +48,7 @@ const EditarTrabajador = ({
     }));
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (
       form.nombre != "" &&
       form.apellido != "" &&
@@ -62,14 +64,35 @@ const EditarTrabajador = ({
           setSalario(false);
           if (form.cont_vacaciones >= 0 && form.cont_vacaciones <= 30) {
             setErrorVacaciones(false);
-            abrirModalEditar();
-            upTrabajador(form);
-            Swal.fire({
-              icon: "success",
-              title: "Trabajador Actualizado Exitosamente",
-              showConfirmButton: false,
-              timer: 1500,
-            });
+            if (
+              formCopia.nombre === form.nombre &&
+              formCopia.apellido === form.apellido &&
+              formCopia.numero_seguro_social === form.numero_seguro_social &&
+              formCopia.salario === form.salario &&
+              formCopia.fecha_contratacion === form.fecha_contratacion &&
+              formCopia.cont_vacaciones === form.cont_vacaciones &&
+              formCopia.is_active === form.is_active
+            ) {
+              abrirModalEditar();
+              Swal.fire({
+                icon: "success",
+                title: "No Se Han Detectado Cambios",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            } else {
+              await updateTrabajador(form);
+
+              abrirModalEditar();
+              Swal.fire({
+                icon: "success",
+                title: "Trabajador Actualizado Exitosamente",
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                upTrabajador();
+              });
+            }
           } else {
             setErrorVacaciones(true);
           }

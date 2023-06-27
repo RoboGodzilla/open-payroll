@@ -12,7 +12,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import HomeIcon from "@mui/icons-material/Home";
 import Trabajadores from "./components/Trabajadores/Trabajadores";
 import Jornadas from "./components/Jornadas/Jornadas";
-import Colilla from "./components/Colilla";
+import Colilla from "./components/Colilla/Colilla";
 import Planilla from "./components/Planilla";
 import Formulario from "./components/Formulario";
 import Grupos from "./components/Grupos/Grupos";
@@ -25,14 +25,6 @@ const routes = [
     icon: <HomeIcon />,
     route: "/inicio",
     component: <Dashboard />,
-  },
-  {
-    type: "collapse",
-    name: "Formulario",
-    key: "formulario",
-    icon: <ArticleIcon />,
-    route: "/formulario",
-    component: <Formulario />,
   },
   {
     type: "collapse",
@@ -50,6 +42,14 @@ const routes = [
     route: "/grupos",
     component: <Grupos />,
   },
+  // {
+  //   type: "collapse",
+  //   name: "Formulario",
+  //   key: "formulario",
+  //   icon: <ArticleIcon />,
+  //   route: "/formulario",
+  //   component: <Formulario />,
+  // },
   {
     type: "collapse",
     name: "Jornadas",
@@ -66,14 +66,15 @@ const routes = [
     route: "/colilla",
     component: <Colilla />,
   },
-  {
-    type: "collapse",
-    name: "Planilla",
-    key: "planilla",
-    icon: <RequestPageIcon />,
-    route: "/planilla",
-    component: <Planilla />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Planilla",
+  //   key: "planilla",
+  //   icon: <RequestPageIcon />,
+  //   route: "/planilla",
+  //   component: <Planilla />,
+  // },
+
   // {
   //   route: "/jijija",
   //   component: <p>jijija</p>,

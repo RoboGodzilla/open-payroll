@@ -138,7 +138,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 color="inherit"
                 sx={navbarIconButton}
                 target="_blank"
-                href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                href="https://github.com/RoboGodzilla/open-payroll/blob/main/Manual.md"
               >
                 <Tooltip title="Ayuda" arrow>
                   <HelpIcon fontSize="medium" sx={iconsStyle} />

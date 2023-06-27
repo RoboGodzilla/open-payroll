@@ -20,6 +20,8 @@ const EditarJornadas = ({
   JornadaSeleccionada,
 }) => {
   const [form, setForm] = useState(JornadaSeleccionada.row);
+  // eslint-disable-next-line no-unused-vars
+  const [formCopia, setFormCopia] = useState(JornadaSeleccionada.row);
   const [value] = React.useState(form.fecha);
   const [valueFeriado, setValueFeriado] = React.useState(form.feriado);
   const [valueSeptimo, setValueSeptimo] = React.useState(form.septimo_dia);
@@ -73,6 +75,7 @@ const EditarJornadas = ({
   };
   const getIdEmpleado = async (id) => {
     const a = await getJornadaById(id);
+
     setForm({ ...form, empleado: a.data.empleado });
   };
   function takeYear(theDate) {
@@ -123,14 +126,31 @@ const EditarJornadas = ({
         setErrorHorasDisponibles(false);
         if (form.multa >= 0) {
           setErrorMulta(false);
-          abrirModalEditar();
-          upJornada(form);
-          Swal.fire({
-            icon: "success",
-            title: "Jornada Actualizada Exitosamente",
-            showConfirmButton: false,
-            timer: 1500,
-          });
+          if (
+            formCopia.horas_extra === form.horas_extra &&
+            formCopia.multa === form.multa &&
+            formCopia.feriado === form.feriado &&
+            formCopia.septimo_dia === form.septimo_dia &&
+            formCopia.vacaciones === form.vacaciones &&
+            formCopia.ausencia === form.ausencia
+          ) {
+            abrirModalEditar();
+            Swal.fire({
+              icon: "success",
+              title: "No Se Han Detectado Cambios",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          } else {
+            abrirModalEditar();
+            upJornada(form);
+            Swal.fire({
+              icon: "success",
+              title: "Jornada Actualizada Exitosamente",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          }
         } else {
           setErrorMulta(true);
         }
@@ -144,6 +164,7 @@ const EditarJornadas = ({
 
   useEffect(() => {
     getIdEmpleado(form.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const BODY = (
     <div className={darkMode ? "modal dark" : "modal ligth"}>
