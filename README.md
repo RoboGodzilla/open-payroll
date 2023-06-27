@@ -8,14 +8,12 @@ evitando errores y multas que pueden dañar tu negocio.
 ## Tecnologías
 
 OpenPayroll usa las siguientes tecnologías:
-
-- [ReactJs] - HTML enhanced for web apps!
-- [VSCode] - awesome web-based text editor
-- [Django] - Markdown parser done right. Fast and easy to extend.
-- [Django REST Framework] - great UI boilerplate for modern web apps
-- [PostgreSQL] - evented I/O for the backend
-- [MaterialUI] - fast node.js network app framework [@tjholowaychuk]
-- [Formik] - the streaming build system
+- [ReactJs] - Libreria de JavaScript para construir interfaces de usuario
+- [VSCode] - Editor de código fuente
+- [Django] - Framework de Python para desarrollo web
+- [Django REST Framework] - Framework de Django para desarrollo de API REST
+- [PostgreSQL] - Sistema de gestión de bases de datos relacional
+- [MaterialUI] - Libreria de React para componentes de interfaz de usuario
 
 ## Instalacion
 
@@ -56,7 +54,6 @@ npm start
 ## License
 
 MIT
-
 **Free Software, Hell Yeah!**
 
 [//]: # (Estos son links de referencia)
